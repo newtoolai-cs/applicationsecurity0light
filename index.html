@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti-Spy | Phone Animation — Light</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f2f2f7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Background ambient glow */
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-glow::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(52,199,89,0.1) 0%, transparent 70%);
+            animation: glowPulse 4s ease-in-out infinite alternate;
+        }
+        @keyframes glowPulse {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Phone container */
+        .scene {
+            perspective: 1000px;
+            position: relative;
+            z-index: 2;
+        }
+        .phone-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        .phone-wrapper.tilting {
+            animation: phoneTilt 6s ease-in-out infinite;
+        }
+        @keyframes phoneTilt {
+            0%   { transform: rotateY(0deg); }
+            15%  { transform: rotateY(-45deg); }
+            30%  { transform: rotateY(-45deg); }
+            50%  { transform: rotateY(0deg); }
+            65%  { transform: rotateY(45deg); }
+            80%  { transform: rotateY(45deg); }
+            100% { transform: rotateY(0deg); }
+        }
+
+        .phone-frame {
+            width: 320px;
+            height: 660px;
+            background: linear-gradient(145deg, #e8e8ed, #d1d1d6);
+            border-radius: 50px;
+            padding: 10px;
+            position: relative;
+            box-shadow:
+                0 50px 100px rgba(0,0,0,0.15),
+                0 0 0 1px rgba(0,0,0,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 0 60px rgba(52,199,89,0.08);
+        }
+
+        /* Side buttons */
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 140px;
+            width: 3px;
+            height: 40px;
+            background: #d1d1d6;
+            border-radius: 0 2px 2px 0;
+        }
+        .phone-frame::after {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 120px;
+            width: 3px;
+            height: 28px;
+            background: #d1d1d6;
+            border-radius: 2px 0 0 2px;
+            box-shadow: 0 50px 0 #d1d1d6;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f2f2f7;
+            border-radius: 42px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 125px;
+            height: 34px;
+            background: #1c1c1e;
+            border-radius: 20px;
+            z-index: 20;
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 28px 0;
+            position: relative;
+            z-index: 10;
+        }
+        .status-time {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1c1c1e;
+        }
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .status-icons svg {
+            width: 16px;
+            height: 16px;
+            fill: #1c1c1e;
+        }
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.5px;
+            height: 12px;
+        }
+        .signal-bars span {
+            width: 3px;
+            background: #1c1c1e;
+            border-radius: 1px;
+        }
+        .signal-bars span:nth-child(1) { height: 4px; }
+        .signal-bars span:nth-child(2) { height: 6px; }
+        .signal-bars span:nth-child(3) { height: 9px; }
+        .signal-bars span:nth-child(4) { height: 12px; }
+        .battery {
+            width: 24px;
+            height: 11px;
+            border: 1.5px solid #1c1c1e;
+            border-radius: 3px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 1.5px;
+        }
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            width: 2px;
+            height: 5px;
+            background: #1c1c1e;
+            border-radius: 0 1px 1px 0;
+        }
+        .battery-fill {
+            width: 70%;
+            height: 100%;
+            background: #34c759;
+            border-radius: 1px;
+        }
+
+        /* Settings UI */
+        .settings-container {
+            padding: 0 20px;
+            height: calc(100% - 50px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 52px 0 20px;
+        }
+        .back-btn {
+            color: #007aff;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .back-btn:hover { opacity: 0.7; }
+        .back-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: #007aff;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .edit-btn {
+            color: #007aff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .edit-btn:hover { opacity: 0.7; }
+
+        /* Toggle row */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 16px;
+            background: #fff;
+            border-radius: 13px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .toggle-label {
+            font-size: 17px;
+            font-weight: 500;
+            color: #1c1c1e;
+        }
+
+        /* iOS Toggle */
+        .ios-toggle {
+            width: 51px;
+            height: 31px;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            background: #e9e9eb;
+            transition: background 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+        .ios-toggle.on { background: #34c759; }
+        .ios-toggle-knob {
+            position: absolute;
+            width: 27px;
+            height: 27px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        .ios-toggle.on .ios-toggle-knob {
+            transform: translateX(20px);
+        }
+
+        /* Security Level label */
+        .security-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1c1c1e;
+            text-align: center;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease 0.2s;
+        }
+        .security-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Circular Dial */
+        .dial-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;
+        }
+        .dial-wrapper.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .dial {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            cursor: pointer;
+            touch-action: none;
+        }
+        .dial svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px rgba(52,199,89,0.12));
+        }
+        .dial-track {
+            fill: none;
+            stroke: rgba(0,0,0,0.06);
+            stroke-width: 16;
+        }
+        .dial-progress {
+            fill: none;
+            stroke-width: 16;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            transition: stroke-dashoffset 0.08s ease;
+        }
+        /* Glow effect on progress */
+        .dial-glow {
+            fill: none;
+            stroke-width: 22;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            opacity: 0.2;
+            filter: blur(6px);
+            transition: stroke-dashoffset 0.08s ease;
+        }
+
+        /* Dial handle (thumb) */
+        .dial-handle {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.04);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: transform 0.08s ease, box-shadow 0.2s;
+            z-index: 5;
+        }
+        .dial-handle.active {
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .dial-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .dial-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1c1c1e;
+            letter-spacing: -2px;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+        .dial-unit {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.35);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Checkmark tick */
+        .tick-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+        }
+        .tick-container.show {
+            opacity: 1;
+        }
+        .tick-circle {
+            fill: none;
+            stroke: #34c759;
+            stroke-width: 3;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 220;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+        .tick-container.show .tick-circle {
+            stroke-dashoffset: 0;
+        }
+        .tick-check {
+            fill: none;
+            stroke: #34c759;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 40;
+            stroke-dashoffset: 40;
+            transition: stroke-dashoffset 0.4s ease 0.4s;
+        }
+        .tick-container.show .tick-check {
+            stroke-dashoffset: 0;
+        }
+        .tick-glow {
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(52,199,89,0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+        }
+        .tick-container.show .tick-glow {
+            opacity: 1;
+        }
+
+        /* Anti-spy screen overlay */
+        .antispy-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 42px;
+            z-index: 30;
+            pointer-events: none;
+            background: #000;
+            opacity: 0;
+            transition: opacity 0.05s linear;
+        }
+
+        /* Home indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 3px;
+        }
+
+        /* Disabled state overlay */
+        .disabled-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(242,242,247,0.6);
+            border-radius: 42px;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+        .disabled-overlay.show {
+            opacity: 1;
+        }
+        .disabled-text {
+            color: rgba(0,0,0,0.4);
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            padding-top: 80px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="scene">
+<div class="phone-wrapper" id="phoneWrapper">
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="antispy-overlay" id="antispyOverlay"></div>
+            <div class="dynamic-island"></div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="status-time" id="statusTime">15:41</span>
+                <div class="status-icons">
+                    <div class="signal-bars">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <svg viewBox="0 0 16 16"><text x="0" y="12" font-size="10" fill="#1c1c1e" font-weight="600">5G</text></svg>
+                    <div class="battery">
+                        <div class="battery-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="settings-container">
+                <div class="settings-nav">
+                    <div class="back-btn">
+                        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                        Settings
+                    </div>
+                    <div class="edit-btn">Edit</div>
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">Anti-spy</span>
+                    <div class="ios-toggle" id="toggle">
+                        <div class="ios-toggle-knob"></div>
+                    </div>
+                </div>
+
+                <div class="security-title" id="secTitle">Security Level</div>
+
+                <div class="dial-wrapper" id="dialWrapper">
+                    <div class="dial" id="dial">
+                        <svg viewBox="0 0 200 200">
+                            <circle class="dial-track" cx="100" cy="100" r="80"/>
+                            <circle class="dial-glow" id="dialGlow" cx="100" cy="100" r="80"
+                                stroke="url(#grad)"
+                                stroke-dasharray="502.65"
+                                stroke-dashoffset="502.65"/>
+                            <circle class="dial-progress" id="dialProgress" cx="100" cy="100" r="80"
+                                stroke="url(#grad)"
+                                stroke-dasharray="502.65"
+                                stroke-dashoffset="502.65"/>
+                            <defs>
+                                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#34c759"/>
+                                    <stop offset="45%" stop-color="#ffcc00"/>
+                                    <stop offset="75%" stop-color="#ff9500"/>
+                                    <stop offset="100%" stop-color="#ff3b30"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="dial-handle" id="dialHandle"></div>
+                        <div class="dial-center" id="dialCenter">
+                            <div class="dial-value" id="dialValue">0%</div>
+                            <div class="dial-unit" id="dialUnit">Protected</div>
+                        </div>
+                        <div class="tick-container" id="tickMark">
+                            <div class="tick-glow"></div>
+                            <svg viewBox="0 0 80 80" width="80" height="80">
+                                <circle class="tick-circle" cx="40" cy="40" r="35"/>
+                                <polyline class="tick-check" points="24,42 35,53 56,30"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    // Update status bar time
+    function updateTime() {
+        const now = new Date();
+        const h = now.getHours().toString().padStart(2, '0');
+        const m = now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('statusTime').textContent = `${h}:${m}`;
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // Elements
+    const toggle = document.getElementById('toggle');
+    const secTitle = document.getElementById('secTitle');
+    const dialWrapper = document.getElementById('dialWrapper');
+    const dial = document.getElementById('dial');
+    const dialProgress = document.getElementById('dialProgress');
+    const dialGlow = document.getElementById('dialGlow');
+    const dialHandle = document.getElementById('dialHandle');
+    const dialValue = document.getElementById('dialValue');
+    const dialCenter = document.getElementById('dialCenter');
+    const dialUnit = document.getElementById('dialUnit');
+    const tickMark = document.getElementById('tickMark');
+
+    const CIRCUMFERENCE = 502.65;
+    let isOn = false;
+    let level = 0;
+    let isDragging = false;
+    let autoAnimId = null;
+
+    // Toggle
+    toggle.addEventListener('click', () => {
+        isOn = !isOn;
+        toggle.classList.toggle('on', isOn);
+
+        if (isOn) {
+            secTitle.classList.add('visible');
+            dialWrapper.classList.add('visible');
+            setTimeout(() => animateDialTo(100, 1800, () => {
+                setTimeout(() => startTilting(), 1200);
+            }), 500);
+        } else {
+            animateDialTo(0, 600, () => {
+                secTitle.classList.remove('visible');
+                dialWrapper.classList.remove('visible');
+            });
+        }
+    });
+
+    function setLevel(val) {
+        level = Math.max(0, Math.min(100, val));
+        const offset = CIRCUMFERENCE * (1 - level / 100);
+        dialProgress.setAttribute('stroke-dashoffset', offset);
+        dialGlow.setAttribute('stroke-dashoffset', offset);
+        dialValue.textContent = Math.round(level) + '%';
+
+        // Update handle position
+        const angle = (level / 100) * 360 - 90;
+        const rad = angle * (Math.PI / 180);
+        const cx = 100 + 80 * Math.cos(rad);
+        const cy = 100 + 80 * Math.sin(rad);
+        const rect = dial.getBoundingClientRect();
+        const px = (cx / 200) * rect.width;
+        const py = (cy / 200) * rect.height;
+        dialHandle.style.left = px + 'px';
+        dialHandle.style.top = py + 'px';
+
+        // Color the value text
+        if (level < 30) {
+            dialValue.style.color = '#ff3b30';
+        } else if (level < 60) {
+            dialValue.style.color = '#ff9500';
+        } else {
+            dialValue.style.color = '#34c759';
+        }
+
+        // Show tick at 100%
+        if (Math.round(level) >= 100) {
+            tickMark.classList.add('show');
+            dialCenter.style.opacity = '0';
+            dialCenter.style.transition = 'opacity 0.3s';
+        } else {
+            tickMark.classList.remove('show');
+            dialCenter.style.opacity = '1';
+        }
+    }
+
+    function animateDialTo(target, duration, cb) {
+        if (autoAnimId) cancelAnimationFrame(autoAnimId);
+        const start = level;
+        const startTime = performance.now();
+        function step(now) {
+            const elapsed = now - startTime;
+            const t = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - t, 3);
+            setLevel(start + (target - start) * ease);
+            if (t < 1) {
+                autoAnimId = requestAnimationFrame(step);
+            } else {
+                autoAnimId = null;
+                if (cb) cb();
+            }
+        }
+        autoAnimId = requestAnimationFrame(step);
+    }
+
+    // Drag interaction
+    function getAngleFromEvent(e) {
+        const rect = dial.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        let angle = Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI) + 90;
+        if (angle < 0) angle += 360;
+        return angle;
+    }
+
+    function handleMove(e) {
+        if (!isDragging || !isOn) return;
+        e.preventDefault();
+        if (autoAnimId) { cancelAnimationFrame(autoAnimId); autoAnimId = null; }
+        const angle = getAngleFromEvent(e);
+        setLevel((angle / 360) * 100);
+    }
+
+    dial.addEventListener('mousedown', (e) => {
+        if (!isOn) return;
+        isDragging = true;
+        dialHandle.classList.add('active');
+        handleMove(e);
+    });
+    dial.addEventListener('touchstart', (e) => {
+        if (!isOn) return;
+        isDragging = true;
+        dialHandle.classList.add('active');
+        handleMove(e);
+    }, { passive: false });
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('mouseup', () => { isDragging = false; dialHandle.classList.remove('active'); });
+    window.addEventListener('touchend', () => { isDragging = false; dialHandle.classList.remove('active'); });
+
+    // Initialize dial at 0
+    setLevel(0);
+
+    // Anti-spy screen effect
+    const antispyOverlay = document.getElementById('antispyOverlay');
+    const phoneWrapperEl = document.getElementById('phoneWrapper');
+    const ANIM_DURATION = 6000;
+    let animStart = null;
+    let tiltingActive = false;
+
+    function getAngleAtProgress(p) {
+        if (p <= 0.15) return -45 * (p / 0.15);
+        if (p <= 0.30) return -45;
+        if (p <= 0.50) return -45 * (1 - (p - 0.30) / 0.20);
+        if (p <= 0.65) return 45 * ((p - 0.50) / 0.15);
+        if (p <= 0.80) return 45;
+        return 45 * (1 - (p - 0.80) / 0.20);
+    }
+
+    function updateAntispyEffect(now) {
+        if (!tiltingActive) {
+            requestAnimationFrame(updateAntispyEffect);
+            return;
+        }
+        const elapsed = (now - animStart) % ANIM_DURATION;
+        const progress = elapsed / ANIM_DURATION;
+        const angle = getAngleAtProgress(progress);
+        const absAngle = Math.abs(angle);
+
+        const darkness = Math.min(1, Math.max(0, (absAngle - 5) / 25));
+        const opacity = Math.pow(darkness, 0.7) * 0.97;
+        antispyOverlay.style.opacity = opacity;
+
+        requestAnimationFrame(updateAntispyEffect);
+    }
+    requestAnimationFrame(updateAntispyEffect);
+
+    function startTilting() {
+        tiltingActive = true;
+        animStart = performance.now();
+        phoneWrapperEl.classList.add('tilting');
+    }
+
+    // Auto-play: toggle on after 1s
+    setTimeout(() => toggle.click(), 1000);
+</script>
+
+</body>
+</html>
